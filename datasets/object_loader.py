@@ -8,6 +8,7 @@ import h5py
 
 from util import log
 from download_dataset import check_dataset
+from datasets.object_generator import DataGenerator
 import tensorflow as tf
 
 ang_interval = 30
@@ -101,11 +102,11 @@ class Dataset(object):
             len(self)
         )
 
-
 def create_default_splits(n, object_class, is_train=True):
+    batch_size=16
+
     ids_train, ids_test = all_ids(object_class)
 
-    from datasets.object_generator import DataGenerator
     datagenerator_train = DataGenerator(ids_train, n, object_class,
                             name='train', is_train=is_train).create_generator
 
@@ -113,54 +114,25 @@ def create_default_splits(n, object_class, is_train=True):
      datagenerator_train, 
      output_types={'image': tf.float32, 'camera_pose': tf.float32,
          'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()}
-     )
+     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()})
 
     dataset_train = dataset_train.repeat()
     dataset_train = dataset_train.shuffle(buffer_size=32)
-    batch_size=16
     dataset_train = dataset_train.batch(batch_size)
-
-    # iterator = dataset_train.make_one_shot_iterator()
-    # el = iterator.get_next()
-    # with tf.Session() as sess:
-    #     while True:
-    #         print(sess.run(el)) 
-    #     exit()
-
-
-
 
     datagenerator_test = DataGenerator(ids_test, n, object_class,
                             name='test', is_train=False).create_generator
-
-
-    gen = datagenerator_train()
-    # while True:
-    #     thing = next(gen)
-    #     print(thing['image'].shape)
-    #     print(thing['id'])
-    #     if thing['image'].shape != (256,256,6):
-    #         import ipdb;ipdb.set_trace()
-    # exit()
-
     dataset_test = tf.data.Dataset.from_generator( 
      datagenerator_test, 
      output_types={'image': tf.float32, 'camera_pose': tf.float32,
          'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()}
-     )
+     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()})
 
     dataset_test = dataset_test.repeat()
     dataset_test = dataset_test.shuffle(buffer_size=32)
     dataset_test = dataset_test.batch(batch_size)
 
-    # dataset_train = Dataset(ids_train, n, object_class,
-    #                         name='train', is_train=is_train)
-    # dataset_test = Dataset(ids_test, n, object_class,
-    #                        name='test', is_train=is_train)
     return dataset_train, dataset_test
-
 
 def all_ids(object_class):
 

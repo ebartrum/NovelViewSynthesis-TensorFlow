@@ -41,7 +41,6 @@ def create_input_ops(dataset,
 
     # single operations
     with tf.device("/cpu:0"), tf.name_scope(scope):
-        # thing = tf.data.Dataset.from_tensor_slices(data_id)
         input_ops['id'] = tf.train.string_input_producer(
            tf.convert_to_tensor(data_id), capacity=128
         ).dequeue(name='input_ids_dequeue')
@@ -66,11 +65,7 @@ def create_input_ops(dataset,
 
     # batchify
     capacity = 2 * batch_size * num_threads
-    # capacity = 5* capacity
     min_capacity = min(int(capacity * 0.75), 1024)
-    # min_capacity = 1024
-    # capacity = min_capacity + (num_threads + 10) * batch_size
-
 
     if shuffle:
         batch_ops = tf.train.shuffle_batch(

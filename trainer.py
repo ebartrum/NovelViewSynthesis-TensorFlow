@@ -38,16 +38,6 @@ class Trainer(object):
         # --- input ops ---
         self.batch_size = config.batch_size
 
-        # _, self.batch_train = create_input_ops(
-        #     dataset, self.batch_size, is_training=True)
-        # _, self.batch_test = create_input_ops(
-        #     dataset_test, self.batch_size, is_training=False)
-
-        # self.batch_train = tf.data.Dataset.from_tensor_slices(
-        #         dataset.ids).shuffle(
-        #                 tf.shape(input_tensor,
-        #                     out_type=tf.int64)[0]).repeat(num_epochs)
-
         # --- optimizer ---
         self.global_step = tf.contrib.framework.get_or_create_global_step(graph=None)
         self.learning_rate = config.learning_rate
