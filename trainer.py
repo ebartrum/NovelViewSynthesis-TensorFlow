@@ -168,10 +168,9 @@ class Trainer(object):
                          )
                )
 
-
 def main():
 
-    config, model, batch_train, batch_test = argparser(is_train=False)
+    config, model, batch_train, batch_test, _ = argparser(is_train=False)
 
     trainer = Trainer(config, model, batch_train, batch_test)
 
