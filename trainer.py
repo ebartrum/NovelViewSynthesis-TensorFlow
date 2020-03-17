@@ -14,9 +14,11 @@ from util import log
 
 class Trainer(object):
 
-    def __init__(self, config, model, dataset, dataset_test):
+    def __init__(self, config, model, batch_train, batch_test):
         self.config = config
         self.model = model
+        self.batch_train = batch_train
+        self.batch_test = batch_test
         hyper_parameter_str = 'bs_{}_lr_{}'.format(
             config.batch_size,
             config.learning_rate,
@@ -36,10 +38,10 @@ class Trainer(object):
         # --- input ops ---
         self.batch_size = config.batch_size
 
-        _, self.batch_train = create_input_ops(
-            dataset, self.batch_size, is_training=True)
-        _, self.batch_test = create_input_ops(
-            dataset_test, self.batch_size, is_training=False)
+        # _, self.batch_train = create_input_ops(
+        #     dataset, self.batch_size, is_training=True)
+        # _, self.batch_test = create_input_ops(
+        #     dataset_test, self.batch_size, is_training=False)
 
         # self.batch_train = tf.data.Dataset.from_tensor_slices(
         #         dataset.ids).shuffle(
@@ -107,7 +109,6 @@ class Trainer(object):
         write_summary_step = self.write_summary_step
 
         for s in xrange(max_steps):
-            import ipdb;ipdb.set_trace()
             # periodic inference
             if s % test_sample_step == 0:
                 step, test_summary, loss, output, step_time = \
@@ -180,9 +181,9 @@ class Trainer(object):
 
 def main():
 
-    config, model, dataset_train, dataset_test = argparser(is_train=False)
+    config, model, batch_train, batch_test = argparser(is_train=False)
 
-    trainer = Trainer(config, model, dataset_train, dataset_test)
+    trainer = Trainer(config, model, batch_train, batch_test)
 
     log.warning("dataset: %s", config.dataset)
     trainer.train()

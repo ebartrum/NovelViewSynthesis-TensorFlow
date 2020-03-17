@@ -43,6 +43,9 @@ class DataGenerator(object):
             id = id.decode("utf-8")
         # preprocessing and data augmentation
         image = 1 - self.data[id]['image'].value/255.*2
+        # if image.shape[2] != 3:
+        #     image = image[:,:,:3]
+
         pose = np.expand_dims(self.data[id]['pose'].value, -1)
         idx = np.concatenate(
             (np.linspace(-self.bound, 0, self.bound+1)[:-1],
@@ -56,6 +59,15 @@ class DataGenerator(object):
             h = id.split('_')[-1]
             id_target = '_'.join([id_base, str(a % int(360/ang_interval)), str(h)])
             image_tmp = 1 - self.data[id_target]['image'].value/255.*2
+            if image.shape[2]>3:
+                image = image[:,:,:3]
+            if image_tmp.shape[2]>3:
+                image_tmp = image_tmp[:,:,:3]
+            # print(image_tmp.shape)
+            # print(id_target)
+            # print(image.shape)
+            # print(id)
+            
             pose_tmp = np.expand_dims(self.data[id_target]['pose'].value, -1)
             image = np.concatenate((image, image_tmp), axis=-1)
             pose = np.concatenate((pose, pose_tmp), axis=-1)
@@ -64,7 +76,7 @@ class DataGenerator(object):
         for i in range(pose.shape[-1]):
             pose_one_hot[pose[0, i], i] = 1
             pose_one_hot[int(360/ang_interval)+int(pose[1, i]/10), i] = 1
-        return id, image, pose_one_hot
+        return {'image': image, 'camera_pose': pose_one_hot, 'id': id}
 
     def get_data_by_id(self, id_list):
         if isinstance(id_list[0], bytes):

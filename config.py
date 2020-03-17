@@ -1,8 +1,6 @@
 import argparse
 import numpy as np
-
 from model import Model
-
 
 def argparser(is_train=True):
 
@@ -63,11 +61,17 @@ def argparser(is_train=True):
 
     dataset_train, dataset_test = \
         dataset.create_default_splits(config.num_input, config.dataset)
-    image, pose = dataset_train.get_data(dataset_train.ids[0])
+    dataset_train = dataset_train.make_one_shot_iterator()
+    dataset_test = dataset_test.make_one_shot_iterator()
+    batch_train = dataset_train.get_next()
+    batch_test = dataset_test.get_next()
+    # image, pose = dataset_train.get_data(dataset_train.ids[0])
 
-    config.data_info = np.concatenate([np.asarray(image.shape), np.asarray(pose.shape)])
+    config.data_info = np.concatenate([np.asarray(
+        dataset_train.output_shapes['image'].as_list()[1:]),
+        np.asarray(dataset_train.output_shapes['camera_pose'].as_list()[1:])])
 
     # --- create model ---
     model = Model(config, debug_information=config.debug, is_train=is_train)
 
-    return config, model, dataset_train, dataset_test
+    return config, model, batch_train, batch_test

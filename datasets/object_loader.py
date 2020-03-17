@@ -124,14 +124,25 @@ def create_default_splits(n, object_class, is_train=True):
     # iterator = dataset_train.make_one_shot_iterator()
     # el = iterator.get_next()
     # with tf.Session() as sess:
-    #     import ipdb;ipdb.set_trace()
-    #     print(sess.run(el)) 
+    #     while True:
+    #         print(sess.run(el)) 
+    #     exit()
 
 
 
 
     datagenerator_test = DataGenerator(ids_test, n, object_class,
                             name='test', is_train=False).create_generator
+
+
+    gen = datagenerator_train()
+    # while True:
+    #     thing = next(gen)
+    #     print(thing['image'].shape)
+    #     print(thing['id'])
+    #     if thing['image'].shape != (256,256,6):
+    #         import ipdb;ipdb.set_trace()
+    # exit()
 
     dataset_test = tf.data.Dataset.from_generator( 
      datagenerator_test, 
@@ -143,10 +154,6 @@ def create_default_splits(n, object_class, is_train=True):
     dataset_test = dataset_test.repeat()
     dataset_test = dataset_test.shuffle(buffer_size=32)
     dataset_test = dataset_test.batch(batch_size)
-
-
-
-
 
     # dataset_train = Dataset(ids_train, n, object_class,
     #                         name='train', is_train=is_train)
