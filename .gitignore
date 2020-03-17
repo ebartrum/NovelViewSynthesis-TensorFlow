@@ -9,3 +9,4 @@ datasets/shapenet/
 *.png
 *.npz
 *.txt
+results
