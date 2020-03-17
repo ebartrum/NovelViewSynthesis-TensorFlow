@@ -16,7 +16,6 @@ ang_interval = 30
 ang_skip = 2
 rs = np.random.RandomState(123)
 
-
 class Dataset(object):
 
     def __init__(self, ids, n, object_class, name='default',
@@ -121,9 +120,9 @@ def create_default_splits(n, object_class, is_train=True):
     dataset_train = dataset_train.batch(batch_size)
 
     datagenerator_test = DataGenerator(ids_test, n, object_class,
-                            name='test', is_train=False).create_generator
+                            name='test', is_train=False)
     dataset_test = tf.data.Dataset.from_generator( 
-     datagenerator_test, 
+     datagenerator_test.create_generator, 
      output_types={'image': tf.float32, 'camera_pose': tf.float32,
          'id': tf.string},
      output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()})
@@ -132,7 +131,7 @@ def create_default_splits(n, object_class, is_train=True):
     dataset_test = dataset_test.shuffle(buffer_size=32)
     dataset_test = dataset_test.batch(batch_size)
 
-    return dataset_train, dataset_test
+    return dataset_train, dataset_test, datagenerator_test
 
 def all_ids(object_class):
 

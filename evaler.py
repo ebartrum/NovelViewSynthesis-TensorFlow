@@ -16,7 +16,7 @@ from util import log
 
 class Evaler(object):
 
-    def __init__(self, config, model, dataset):
+    def __init__(self, config, model, dataset, datagenerator):
         self.config = config
         self.model = model
         self.train_dir = config.train_dir
@@ -26,10 +26,11 @@ class Evaler(object):
         self.batch_size = config.batch_size
 
         self.dataset = dataset
+        self.datagenerator = datagenerator
 
-        _, self.batch = create_input_ops(dataset, self.batch_size,
-                                         is_training=False,
-                                         shuffle=False)
+        # _, self.batch = create_input_ops(dataset, self.batch_size,
+        #                                  is_training=False,
+        #                                  shuffle=False)
 
         self.global_step = tf.contrib.framework.get_or_create_global_step(graph=None)
         self.step_op = tf.no_op(name='step_no_op')
@@ -157,7 +158,7 @@ class Evaler(object):
             pose = []
             id = []
             for id_data in id_batch_list:
-                img, p = self.dataset.get_data_by_id(id_data)
+                img, p = self.datagenerator.get_data_by_id(id_data)
                 image.append(img)
                 pose.append(p)
                 id.append(id_data[0])
@@ -226,9 +227,9 @@ class Evaler(object):
 
 def main():
 
-    config, model, _, dataset_test = argparser(is_train=False)
+    config, model, _, dataset_test, datagenerator_test = argparser(is_train=False)
 
-    evaler = Evaler(config, model, dataset_test)
+    evaler = Evaler(config, model, dataset_test, datagenerator_test)
 
     log.warning("dataset: %s", config.dataset)
     evaler.eval_run()
