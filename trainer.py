@@ -29,6 +29,7 @@ class Trainer(object):
             time.strftime("%Y%m%d-%H%M%S")
         )
 
+        
         if not os.path.exists(self.train_dir): os.makedirs(self.train_dir)
         log.infov("Train Dir: %s", self.train_dir)
 
@@ -39,6 +40,11 @@ class Trainer(object):
             dataset, self.batch_size, is_training=True)
         _, self.batch_test = create_input_ops(
             dataset_test, self.batch_size, is_training=False)
+
+        # self.batch_train = tf.data.Dataset.from_tensor_slices(
+        #         dataset.ids).shuffle(
+        #                 tf.shape(input_tensor,
+        #                     out_type=tf.int64)[0]).repeat(num_epochs)
 
         # --- optimizer ---
         self.global_step = tf.contrib.framework.get_or_create_global_step(graph=None)
@@ -93,7 +99,6 @@ class Trainer(object):
 
     def train(self):
         log.infov("Training Starts!")
-        print(self.batch_train)
 
         max_steps = self.max_steps
         ckpt_save_step = self.ckpt_save_step
@@ -102,6 +107,7 @@ class Trainer(object):
         write_summary_step = self.write_summary_step
 
         for s in xrange(max_steps):
+            import ipdb;ipdb.set_trace()
             # periodic inference
             if s % test_sample_step == 0:
                 step, test_summary, loss, output, step_time = \

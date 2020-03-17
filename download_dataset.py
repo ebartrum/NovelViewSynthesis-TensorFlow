@@ -38,7 +38,7 @@ def download_file_from_google_drive(id, destination):
 
 
 def check_dataset(file_path, dataset_name):
-    assert dataset_name in ['car', 'chair', 'kitti', 'synthia']
+    assert dataset_name in ['car', 'megacar', 'megachair', 'megaplane', 'miniplane', 'chair', 'kitti', 'synthia']
 
     if not osp.isfile(file_path):
         log.warn('The {} dataset is not found. '

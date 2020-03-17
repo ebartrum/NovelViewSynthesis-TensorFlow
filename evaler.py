@@ -121,7 +121,7 @@ class Evaler(object):
                         else:
                             raise ValueError('Plotting images requires an id list.')
 
-                    loss_all.append(np.array(loss.values()))
+                    loss_all.append(np.array(list(loss.values())))
                     time_all += step_time
 
                     s += 1
@@ -189,7 +189,7 @@ class Evaler(object):
         loss_str = ""
         for key, i in sorted(zip(loss_key, range(len(loss_key)))):
             loss_str += "{}:{loss: .5f}\n".format(
-                loss_key[i], loss=loss[i] if 'loss' not in loss_key[i] else loss[i]/2*3)
+                list(loss_key)[i], loss=loss[i] if 'loss' not in list(loss_key)[i] else loss[i]/2*3)
         log_fn = (is_train and log.info or log.infov)
         if self.config.data_id_list is None:
             data_str = 'Total datapoint: {}'.format(

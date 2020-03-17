@@ -5,10 +5,10 @@ from __future__ import print_function
 import os.path as osp
 import numpy as np
 import h5py
+from itertools import cycle
 
 from util import log
 from download_dataset import check_dataset
-import tensorflow as tf
 
 ang_interval = 30
 # ang_interval = 10
@@ -16,7 +16,7 @@ ang_skip = 2
 rs = np.random.RandomState(123)
 
 
-class Dataset(object):
+class DataGenerator(object):
 
     def __init__(self, ids, n, object_class, name='default',
                  max_examples=None, is_train=True):
@@ -64,7 +64,7 @@ class Dataset(object):
         for i in range(pose.shape[-1]):
             pose_one_hot[pose[0, i], i] = 1
             pose_one_hot[int(360/ang_interval)+int(pose[1, i]/10), i] = 1
-        return image, pose_one_hot
+        return id, image, pose_one_hot
 
     def get_data_by_id(self, id_list):
         if isinstance(id_list[0], bytes):
@@ -88,6 +88,13 @@ class Dataset(object):
             pose_one_hot[int(360/ang_interval)+int(pose[1, i]/10), i] = 1
         return image, pose_one_hot
 
+    def create_generator(self):
+        cycle_ids = cycle(self._ids)
+        while True:
+            id = next(cycle_ids)
+            yield self.get_data(id)
+        
+
     @property
     def ids(self):
         return self._ids
@@ -105,53 +112,10 @@ class Dataset(object):
 def create_default_splits(n, object_class, is_train=True):
     ids_train, ids_test = all_ids(object_class)
 
-    from datasets.object_generator import DataGenerator
-    datagenerator_train = DataGenerator(ids_train, n, object_class,
-                            name='train', is_train=is_train).create_generator
-
-    dataset_train = tf.data.Dataset.from_generator( 
-     datagenerator_train, 
-     output_types={'image': tf.float32, 'camera_pose': tf.float32,
-         'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()}
-     )
-
-    dataset_train = dataset_train.repeat()
-    dataset_train = dataset_train.shuffle(buffer_size=32)
-    batch_size=16
-    dataset_train = dataset_train.batch(batch_size)
-
-    # iterator = dataset_train.make_one_shot_iterator()
-    # el = iterator.get_next()
-    # with tf.Session() as sess:
-    #     import ipdb;ipdb.set_trace()
-    #     print(sess.run(el)) 
-
-
-
-
-    datagenerator_test = DataGenerator(ids_test, n, object_class,
-                            name='test', is_train=False).create_generator
-
-    dataset_test = tf.data.Dataset.from_generator( 
-     datagenerator_test, 
-     output_types={'image': tf.float32, 'camera_pose': tf.float32,
-         'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()}
-     )
-
-    dataset_test = dataset_test.repeat()
-    dataset_test = dataset_test.shuffle(buffer_size=32)
-    dataset_test = dataset_test.batch(batch_size)
-
-
-
-
-
-    # dataset_train = Dataset(ids_train, n, object_class,
-    #                         name='train', is_train=is_train)
-    # dataset_test = Dataset(ids_test, n, object_class,
-    #                        name='test', is_train=is_train)
+    dataset_train = Dataset(ids_train, n, object_class,
+                            name='train', is_train=is_train)
+    dataset_test = Dataset(ids_test, n, object_class,
+                           name='test', is_train=is_train)
     return dataset_train, dataset_test
 
 
