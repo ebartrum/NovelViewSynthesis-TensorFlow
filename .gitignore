@@ -1,5 +1,6 @@
 train_dir/
 .ropeproject/
+datasets/shapenet/
 *.py[cod]
 *.sw[op]
 *.hdf5
