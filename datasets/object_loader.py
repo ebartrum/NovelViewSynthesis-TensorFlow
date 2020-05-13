@@ -101,8 +101,7 @@ class Dataset(object):
             len(self)
         )
 
-def create_default_splits(n, object_class, is_train=True):
-    batch_size=16
+def create_default_splits(n, object_class, is_train=True, batch_size=16):
 
     ids_train, ids_test = all_ids(object_class)
 
@@ -113,7 +112,7 @@ def create_default_splits(n, object_class, is_train=True):
      datagenerator_train, 
      output_types={'image': tf.float32, 'camera_pose': tf.float32,
          'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()})
+     output_shapes={'image': (128,128,6), 'camera_pose': (15, 2), 'id' : ()})
 
     dataset_train = dataset_train.repeat()
     dataset_train = dataset_train.shuffle(buffer_size=32)
@@ -125,7 +124,7 @@ def create_default_splits(n, object_class, is_train=True):
      datagenerator_test.create_generator, 
      output_types={'image': tf.float32, 'camera_pose': tf.float32,
          'id': tf.string},
-     output_shapes={'image': (256,256,6), 'camera_pose': (15, 2), 'id' : ()})
+     output_shapes={'image': (128,128,6), 'camera_pose': (15, 2), 'id' : ()})
 
     dataset_test = dataset_test.repeat()
     dataset_test = dataset_test.shuffle(buffer_size=32)

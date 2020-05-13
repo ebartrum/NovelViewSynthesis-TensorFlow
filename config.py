@@ -60,7 +60,7 @@ def argparser(is_train=True):
         import datasets.scene_loader as dataset
 
     dataset_train, dataset_test, datagenerator_test = \
-        dataset.create_default_splits(config.num_input, config.dataset)
+        dataset.create_default_splits(config.num_input, config.dataset, batch_size=config.batch_size)
     dataset_train = dataset_train.make_one_shot_iterator()
     dataset_test = dataset_test.make_one_shot_iterator()
     batch_train = dataset_train.get_next()
